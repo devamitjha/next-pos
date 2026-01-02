@@ -1,0 +1,104 @@
+homepage:agentlogin
+/store/
+/jewellery/
+/jewellery/category-name
+/jewellery/product-name
+/checkout/cart
+/checkout/payment
+/success
+/failure
+/agent/
+/agent/report
+/agent/logout
+/user/profile
+/user/address
+/user/order-history
+
+App Router – Folder Structure
+src/
+└── app/
+    ├── layout.jsx                 # Root layout
+    ├── globals.css
+    ├── page.jsx                   # / → agent login (homepage)
+
+    ├── store/
+    │   └── page.jsx               # /store
+
+    ├── jewellery/
+    │   ├── page.jsx               # /jewellery
+    │   ├── [category-name]/
+    │   │   └── page.jsx           # /jewellery/category-name
+    │   └── product/
+    │       └── [product-name]/
+    │           └── page.jsx       # /jewellery/product-name
+
+    ├── checkout/
+    │   ├── cart/
+    │   │   └── page.jsx           # /checkout/cart
+    │   └── payment/
+    │       └── page.jsx           # /checkout/payment
+
+    ├── success/
+    │   └── page.jsx               # /success
+
+    ├── failure/
+    │   └── page.jsx               # /failure
+
+    ├── agent/
+    │   ├── page.jsx               # /agent (dashboard)
+    │   ├── report/
+    │   │   └── page.jsx           # /agent/report
+    │   └── logout/
+    │       └── page.jsx           # /agent/logout
+
+    ├── user/
+    │   ├── profile/
+    │   │   └── page.jsx           # /user/profile
+    │   ├── address/
+    │   │   └── page.jsx           # /user/address
+    │   └── order-history/
+    │       └── page.jsx           # /user/order-history
+
+    └── not-found.jsx
+
+
+
+    Redux Folder Structure
+    src/
+    └── redux/
+        ├── store.js
+        ├── provider.jsx
+
+        └── slices/
+            ├── agentSlice.js
+            ├── userSlice.js
+            ├── cartSlice.js
+            ├── productSlice.js
+            ├── orderSlice.js
+            └── uiSlice.js
+
+
+Components Structure (shadcn + POS specific)
+src/
+└── components/
+    ├── ui/                       # shadcn components
+    ├── layout/
+    │   ├── Header.jsx
+    │   ├── Footer.jsx
+    │   └── Sidebar.jsx
+
+    ├── auth/
+    │   └── AgentLoginForm.jsx
+
+    ├── product/
+    │   ├── ProductCard.jsx
+    │   ├── ProductList.jsx
+    │   └── ProductGallery.jsx
+
+    ├── cart/
+    │   ├── CartItem.jsx
+    │   └── CartSummary.jsx
+
+    ├── checkout/
+    │   ├── PaymentMethod.jsx
+    │   └── OrderReview.jsx
