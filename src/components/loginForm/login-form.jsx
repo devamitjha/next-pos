@@ -33,9 +33,10 @@ export function LoginForm() {
     try {
       await trigger({ agentCode, password });
       toast.success("Login successful");
-      router.push("/profile");
+      router.push("/store");
     } catch (err) {
       toast.error(err.message);
+      console.log(err.message)
     }
   };
 

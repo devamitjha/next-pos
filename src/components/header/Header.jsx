@@ -18,7 +18,7 @@ const Header = () => {
   const userNme = { name: "Amit Jha", avatar: "" };
   const initials = useInitials(userNme?.name);
   const selectedStore = useSelector((state) => state.selectedStore.store);
-  const selectedStoreName = selectedStore?.name
+  const selectedStoreName = selectedStore?.mailing_name
 
   const dispatch = useDispatch();
   const activeSheet = useSelector((state) => state.sheet.activeSheet)

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   store: null,
+  allStores: [],
 };
 
 const selectedStoreSlice = createSlice({
@@ -11,11 +12,20 @@ const selectedStoreSlice = createSlice({
     setSelectedStore: (state, action) => {
       state.store = action.payload;
     },
+    setAllStores: (state, action) => {
+      state.allStores = action.payload;
+    },
     clearSelectedStore: (state) => {
       state.store = null;
+      state.allStores = [];
     },
   },
 });
 
-export const { setSelectedStore, clearSelectedStore } = selectedStoreSlice.actions;
+export const {
+  setSelectedStore,
+  setAllStores,
+  clearSelectedStore,
+} = selectedStoreSlice.actions;
+
 export default selectedStoreSlice.reducer;
