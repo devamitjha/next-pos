@@ -16,7 +16,7 @@ export async function GET(req) {
     const token = await getORNToken();
 
     const res = await axios.post(
-      "https://lucira.uat.ornaverse.in/Services/POS/SchemeEnrollment/List",
+      "https://lucira.live.ornaverse.in/Services/POS/SchemeEnrollment/List",
       {
         Take: 0,
         party_id: Number(party_id),

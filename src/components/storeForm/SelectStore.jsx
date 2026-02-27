@@ -98,7 +98,7 @@ export function SelectStore() {
             </SelectContent>
           </Select>
 
-          <Button type="submit" className="h-15 w-full uppercase text-lg">
+          <Button type="submit" className="h-15 w-full uppercase text-lg cursor-pointer">
             Select
           </Button>
         </div>
