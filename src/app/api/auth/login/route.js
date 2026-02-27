@@ -23,7 +23,7 @@ export async function POST(req) {
     });
 
     const response = await axios.post(
-      "https://lucira.uat.ornaverse.in/connect/token",
+      "https://lucira.live.ornaverse.in/connect/token",
       data,
       {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },

@@ -10,8 +10,8 @@ export default function StorePage() {
       style={{ backgroundImage: `url(${Storebg.src})` }}
     >
       <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col justify-between bg-white px-15 py-20 rounded-2xl shadow-lg w-full max-w-155 mx-auto gap-20">
-          <Image src={Logo.src} alt="lucira" className="mx-auto" width={460} height={118} priority/>
+        <div className="flex flex-col justify-between bg-white p-15 rounded-2xl shadow-lg w-full max-w-115 mx-auto gap-20">
+          <Image src={Logo.src} alt="lucira" className="mx-auto" width={200} height={51} priority/>
           <SelectStore />
         </div>
       </div>

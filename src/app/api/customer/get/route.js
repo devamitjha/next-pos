@@ -10,7 +10,7 @@ export async function POST(req) {
     const token = await getORNToken();
 
     const res = await axios.post(
-      "https://lucira.uat.ornaverse.in/Services/POS/Customer/GetCustomer",
+      "https://lucira.live.ornaverse.in/Services/POS/Customer/GetCustomer",
       { mobile },
       {
         headers: {

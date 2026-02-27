@@ -18,7 +18,7 @@ export async function POST(req) {
     const accessToken = payload.access_token;
 
     const response = await axios.post(
-      "https://lucira.uat.ornaverse.in/Services/Administration/Stores/GetUserStores",
+      "https://lucira.live.ornaverse.in/Services/Administration/Stores/GetUserStores",
       { Take: 0 },
       {
         headers: {

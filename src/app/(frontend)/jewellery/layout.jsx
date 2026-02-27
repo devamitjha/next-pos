@@ -41,7 +41,7 @@ export default function JewelleryLayout({ children }) {
                   href={
                     item.slug === "all"
                       ? "/jewellery"
-                      : `/jewellery/${item.slug}`
+                      : `/jewellery/${item.slug}?t=${item.type_id}`
                   }
                   className={`
                     px-4 py-2 text-[12px] uppercase rounded-sm border transition

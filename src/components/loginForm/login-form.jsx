@@ -40,7 +40,7 @@ export function LoginForm() {
     }
   };
 
-  return (
+  return ( 
     <form
       className="flex flex-col gap-6"
       onSubmit={storeAgentLogin}
@@ -53,7 +53,7 @@ export function LoginForm() {
         <div className="flex flex-col gap-5 w-full">
           <Field>
             <Input
-              className="h-15"
+              className="h-14"
               type="text"
               value={agentCode}
               onChange={(e) => setAgentCode(e.target.value)}
@@ -62,7 +62,7 @@ export function LoginForm() {
             />
           </Field>
 
-          <InputGroup  className="h-15 relative">
+          <InputGroup  className="h-14 relative">
             <InputGroupInput placeholder="Enter password" type={showPassword ? "text" : "password"} required  value={password}  onChange={(e) => setPassword(e.target.value)}/>   
             <div className="w-15 h-full flex justify-center items-center" onClick={() => setShowPassword((prev) => !prev)}>
               {showPassword ? <Eye size={18} color="gray"/> : <EyeOff size={18} color="gray" />}
@@ -72,7 +72,7 @@ export function LoginForm() {
           <Field>
               <Button
                 type="submit"
-                className="h-15 w-full uppercase text-lg cursor-pointer"
+                className="h-14 w-full uppercase text-lg cursor-pointer"
                 disabled={isMutating}
               >
                 {isMutating ? "Logging in..." : "Login"}
