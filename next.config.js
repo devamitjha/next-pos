@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "cdn.shopify.com",
         pathname: "/s/files/**",
       },
+      {
+        protocol: "https",
+        hostname: "lucira.live.ornaverse.in",
+        pathname: "/**", // allow all paths from this domain
+      },
     ],
     dangerouslyAllowSVG: true,
   },

@@ -7,11 +7,14 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
 
   const page = Number(searchParams.get("page") || 0);
-  const limit = Number(searchParams.get("limit") || 20);
+  const limit = Number(searchParams.get("limit") || 16);
+  const typeId = searchParams.get("t");
   const skip = page * limit;
 
   // 🔐 Read session cookie
   const session = req.cookies.get("session")?.value;
+  const companyId = req.cookies.get("company_id")?.value;
+
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -29,10 +32,21 @@ export async function GET(req) {
   }
 
   try {
-    /* ================= PRODUCTS ================= */
+    /* ================= PRODUCT CATALOG ================= */
+    const body = {
+      Take: limit,
+      Skip: skip,
+      current_company_id: companyId ? Number(companyId) : null,
+      show_out_of_stock: false,
+    };
+
+    if (typeId && typeId !== "40") { // 40 is "All" in the layout
+      body.type_id = Number(typeId);
+    }
+
     const productRes = await axios.post(
-      "https://lucira.live.ornaverse.in/Services/Master/Style/GetDesigns",
-      { Take: limit, Skip: skip },
+      "https://lucira.live.ornaverse.in/Services/Inventory/ProductCatalog/List",
+      body,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -41,90 +55,28 @@ export async function GET(req) {
       }
     );
 
-    const products = productRes.data.Entities || [];
+    const products = productRes.data?.Entities || [];
+    const totalCount = productRes.data?.TotalCount || 0;
 
-    /* ================= MERGE DATA ================= */
-    const enrichedProducts = await Promise.all(
-      products.map(async (product) => {
-        let reviews = { count: 0, average: 0, stats: [] };
-        let images = [];
-
-        if (product.external_product_id) {
-          /* ---------- Reviews ---------- */
-          try {
-            const reviewRes = await axios.get(
-              "https://platform.nector.io/api/v2/merchant/reviews",
-              {
-                params: {
-                  reference_product_id: product.external_product_id,
-                },
-                headers: {
-                  "x-apikey": process.env.NECTOR_API_KEY,
-                  "x-source": "mobile",
-                  "x-workspaceid": process.env.NECTOR_WORKSPACE_ID,
-                },
-              }
-            );
-
-            const reviewData = reviewRes.data.data;
-            reviews = {
-              count: reviewData.count || 0,
-              stats: reviewData.stats || [],
-              average: calculateAverage(reviewData.stats),
-            };
-          } catch {
-            // safe fail
-          }
-
-          /* ---------- Images ---------- */
-          try {
-            const imgRes = await axios.get(
-              `https://luciraonline.myshopify.com/admin/api/2025-10/products/${product.external_product_id}/images.json`,
-              {
-                headers: {
-                  "X-Shopify-Access-Token":
-                    process.env.SHOPIFY_ADMIN_TOKEN,
-                },
-              }
-            );
-            images = imgRes.data.images || [];
-          } catch {
-            // safe fail
-          }
-        }
-
-        return {
-          ...product,
-          reviews,
-          images,
-        };
-      })
-    );
+    // 💰 Add mock price if missing (starting from 5000)
+    const productsWithPrice = products.map((p) => ({
+      ...p,
+      price: p.price || (5000 + (p.item_id % 10000)),
+    }));
 
     return NextResponse.json({
       page,
       limit,
+      totalCount,
       hasMore: products.length === limit,
-      products: enrichedProducts,
+      products: productsWithPrice,
     });
+
   } catch (error) {
-    console.error("Product API error:", error);
+    console.error("Product API error:", error?.response?.data || error.message);
     return NextResponse.json(
       { message: "Failed to load products" },
       { status: 500 }
     );
   }
 }
-
-/* ⭐ Average rating helper */
-const calculateAverage = (stats = []) => {
-  let total = 0;
-  let count = 0;
-
-  stats.forEach((s) => {
-    total += Number(s.rating) * Number(s.count);
-    count += Number(s.count);
-  });
-
-  return count ? Number((total / count).toFixed(1)) : 0;
-};

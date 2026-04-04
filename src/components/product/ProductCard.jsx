@@ -1,74 +1,107 @@
 import React from 'react'
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { ChevronRight, Star, Tally1   } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "@/redux/slices/cartSlice";
+import { Plus, Eye } from "lucide-react";
+import { motion } from "framer-motion";
 
+const ProductCard = ({product, index}) => {  
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart.items);
+    
+    const imageUrl = `https://lucira.live.ornaverse.in/upload/${product.image}`
+    const validImage = imageUrl && imageUrl !== "null" && !imageUrl.endsWith("/null") ? imageUrl : "/images/sample.jpg";
+    
+    const isAdded = cartItems.find((item) => item.item_id === product.item_id);
 
-const slugify = (text) => {
-  return text
-    .toLowerCase()
-    .replace(/%20/g, " ")   
-    .replace(/\s+/g, "-") 
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .trim();
-};
-
-
-const ProductCard = ({product}) => {  
-    const slug = slugify(product.style_name);
     const viewProductDetails = ()=>{
-        localStorage.setItem("shopifyImageID", JSON.stringify(product.external_product_id));
-        navigate(`/${slug}`);
+        router.push(`/jewellery/product/${product.item_id}`);
     }
+
   return (
-    <div className="rounded-sm mb-1">
-        <Link href="/product-details">
-            <AspectRatio ratio={1/1} className="bg-muted rounded-lg overflow-hidden cursor-pointer" >       
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: (index % 10) * 0.05 }}
+      whileHover={{ y: -8 }}
+      className="bg-white rounded-[2rem] p-6 flex flex-col items-center gap-4 cursor-pointer shadow-sm border border-gray-50 mb-4 group relative overflow-hidden"
+      onClick={viewProductDetails}
+    >
+        <div className="w-40 h-40 rounded-full bg-[#FDF7F5] flex items-center justify-center p-2 border border-orange-50/50 relative">
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.6 }}
+              className="w-full h-full rounded-full overflow-hidden relative shadow-inner"
+            >
                 <Image
-                    src={product.images?.[0]?.src || "/images/sample.jpg"}
-                    alt={product.style_name}
-                    width="400"
-                    height="400"
+                    src={validImage}
+                    alt={product.item_name || "Jewellery"}
+                    fill
+                    sizes="160px"
                     priority
-                    className="w-full h-full object-cover hover:scale-110 transition-all duration-500"
-                />           
-            </AspectRatio>
-        </Link>
-        <div className="flex justify-between items-center w-full gap-4 px-2 mt-4">
-            <div className="flex w-1/2 space-x-1 justify-start items-center">
-                <span className="w-4 h-4 rounded-full bg-[linear-gradient(135deg,#FAD813,#FFE585,#FAD813)]"></span>
-                <span className="w-4 h-4 rounded-full bg-[linear-gradient(135deg,#FFB289,#FFC9AC,#FFB289)]"></span>
-                <span className="w-4 h-4 rounded-full bg-[linear-gradient(135deg,#C8C8C8,#F2F2F2,#C5C5C5)]"></span>
-            </div>
-                {
-                    product.reviews.count >=1 && 
-                    <div className="flex w-1/2 space-x-2 justify-end items-center">
-                        <div className="flex items-center justify-start space-x-0.5">
-                            <Star size={12} strokeWidth={1} className="text-amber-400 fill-amber-400"/>
-                            <span className="text-sm">{product.reviews.average}</span>
-                        </div>
-                        <div className="w-px h-3 bg-black/50">{/* <Tally1 size={14} strokeWidth={1}/> */}</div>
-                        <div className="text-sm">({product.reviews.count})</div>
-                    </div>
-                }                
+                    className="object-cover"
+                />
+            </motion.div>
+            
+            {/* Quick Actions Overlay on Image */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              className="absolute inset-0 flex items-center justify-center gap-2 bg-black/5 rounded-full backdrop-blur-[2px] transition-all"
+            >
+               <button 
+                 className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-800 shadow-md hover:bg-[#EA734D] hover:text-white transition-all transform hover:scale-110"
+               >
+                 <Eye size={18} />
+               </button>
+            </motion.div>
         </div>
-        <div className="product-details space-y-2 mt-2.5 px-2">
-            <h2 className="line-clamp-1 text-base cursor-pointer hover:text-brand transition-colors" onClick={viewProductDetails}>{product.style_name}</h2>
-            <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold text-lg">
-                        ₹{Number(product.price? product.price : 0).toLocaleString("en-IN")} 
-                    </span>
-                    <span className="line-through text-gray-500 text-md">
-                        ₹{Number(product.compare_at_price ? product.compare_at_price : 0).toLocaleString("en-IN")}
-                    </span>
-                </div>
-                <div className="text-[10px] text-gray-500 flex items-center justify-center cursor-pointer hover:text-brand transition-colors" onClick={viewProductDetails}>View Details <ChevronRight size={8}/></div>
+        
+        <div className="text-center space-y-1 w-full z-10">
+            <h2 className="text-sm font-bold text-gray-800 line-clamp-2 min-h-[2.5rem] flex items-center justify-center px-2">
+              {product.item_name || "Jewellery Item"}
+            </h2>
+            <div className="flex flex-col items-center mb-4">
+                <span className="text-lg font-black text-[#EA734D]">
+                   {`₹${Number(product.price || 5000).toLocaleString("en-IN")}`}  
+                </span>
+                <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wider">
+                    {product.weight ? `${product.weight}g Available` : "In Stock"}
+                </span>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="flex gap-2 w-full pt-2">
+               <motion.button 
+                 whileTap={{ scale: 0.95 }}
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   if (!isAdded) {
+                     dispatch(addItem(product));
+                   }
+                 }}
+                 className={`flex-1 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                   isAdded 
+                     ? "bg-green-50 text-green-600 cursor-default" 
+                     : "bg-gray-900 text-white hover:bg-black shadow-lg shadow-gray-200"
+                 }`}
+               >
+                 {isAdded ? "Added" : <><Plus size={14} /> Add</>}
+               </motion.button>
+               <motion.button 
+                 whileTap={{ scale: 0.95 }}
+                 className="w-10 h-10 border-2 border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-[#EA734D] hover:border-orange-100 transition-all"
+               >
+                 <Eye size={16} />
+               </motion.button>
             </div>
         </div>
-    </div>
+        
+        {/* Subtle Decorative Background Element */}
+        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-orange-50/30 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+    </motion.div>
   )
 }
 

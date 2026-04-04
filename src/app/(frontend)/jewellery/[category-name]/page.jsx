@@ -1,7 +1,6 @@
 "use client";
 import ProductCard from "@/components/product/ProductCard";
 import { usePathname } from "next/navigation";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useProducts } from "@/services/useProducts";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -9,34 +8,31 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SkeletonCard = () => {
   return (
     <div className="flex flex-col space-y-3">
-      <Skeleton className="h-73.25 w-73.25 rounded-xl" />
-      <div className="space-y-2 h-20">
-        <Skeleton className="h-4 w-62.5" />
-        <Skeleton className="h-4 w-50" />
-        <Skeleton className="h-4 w-40" />
+      <Skeleton className="aspect-square w-full rounded-xl" />
+      <div className="space-y-2 px-1">
+        <Skeleton className="h-4 w-3/4" />
+        <div className="flex justify-between items-center pt-2">
+           <div className="space-y-1 w-1/2">
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-5 w-full" />
+           </div>
+           <Skeleton className="h-8 w-12 rounded-md" />
+        </div>
       </div>
     </div>
   );
 };
 
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { setTotalCount } from "@/redux/slices/productSlice";
+
 export default function Page() {
   const pathname = usePathname();
-   const activeCategory =
-    pathname === "/jewellery"
-      ? "all"
-      : pathname.split("/")[2];
-      
-
-  const formatCategory = (slug) => {
-    if (!slug || slug === "all") return "All Jewellery";
-
-    return slug
-      .split("-")
-      .map(
-        word => word.charAt(0).toUpperCase() + word.slice(1)
-      )
-      .join(" ");
-  };
+  const dispatch = useDispatch();
+  const activeCategory = pathname === "/jewellery" ? "all" : pathname.split("/")[2];
+  const isSideCartOpen = useSelector((state) => state.sheet.isSideCartOpen);
 
   const {
     data,
@@ -46,46 +42,56 @@ export default function Page() {
     error,
   } = useProducts(16);
 
-  if (error) {
-    return <p className="text-red-500">Failed to load products</p>;
-  }
-
   const products = data ? data.flatMap((p) => p.products) : [];
   const hasMore = data ? data[data.length - 1]?.hasMore : true;
+  const totalCount = data ? data[0]?.totalCount : 0;
 
-  console.log("products:", products); // 👈 keep this for now
+  useEffect(() => {
+    dispatch(setTotalCount(totalCount));
+  }, [totalCount, dispatch]);
+
+  if (error) {
+    return <p className="text-red-500 text-center py-10 font-bold">Failed to load products. Please try again.</p>;
+  }
+
+  const gridCols = isSideCartOpen 
+    ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" 
+    : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
   return (
-        <>         
-          <div className="dynamic-title flex justify-between gap-4 items-center mb-4 text-sm">
-            <div>Jewellery :: {formatCategory(activeCategory)}</div>
-            <div>396 Items <span>|</span> In Stock</div>
+    <>         
+      <InfiniteScroll
+        dataLength={products.length}
+        next={() => setSize(size + 1)}
+        hasMore={hasMore}
+        loader={
+          <div className={`grid ${gridCols} gap-8 mt-8`}>
+            {[...Array(4)].map((_, i) => (
+              <SkeletonCard key={`loader-${i}`} />
+            ))}
           </div>
-          <InfiniteScroll
-            dataLength={products.length}
-            next={() => setSize(size + 1)}
-            hasMore={hasMore}
-            loader={
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mt-3">
-                {[...Array(8)].map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
-            }
-            scrollableTarget="scrollableDiv"   // ✅ CRITICAL LINE
-          >
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-              {products.map(
-                (product) =>
-                  product.images?.[0]?.src && (
-                    <ProductCard
-                      key={product.style_id}
-                      product={product}
-                    />
-                  )
-              )}
-            </div>
-          </InfiniteScroll>
-        </>  
+        }
+        endMessage={
+          <p className="text-center text-gray-400 my-10 font-medium italic">
+            Yay! You have seen it all 💎
+          </p>
+        }
+        scrollableTarget="main-scroll-root"
+      >
+        <div className={`grid ${gridCols} gap-8`}>
+          {products.map((product, index) => (
+            <ProductCard key={`${product.item_id}-${index}`} product={product} index={index} />
+          ))}
+        </div>
+      </InfiniteScroll>
+
+      {isLoading && products.length === 0 && (
+        <div className={`grid ${gridCols} gap-8`}>
+          {[...Array(12)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      )}
+    </>  
   );
 }

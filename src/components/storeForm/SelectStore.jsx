@@ -48,7 +48,10 @@ export function SelectStore() {
     await fetch("/api/stores/select", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ storeCode: storeObj.company_code }),
+      body: JSON.stringify({ 
+        storeCode: storeObj.company_code,
+        companyId: storeObj.user_company_id
+      }),
     });
 
     // ✅ save store in Redux (UI)
@@ -57,6 +60,7 @@ export function SelectStore() {
       setSelectedStore({
         code: storeObj.company_code,
         name: storeObj.mailing_name,
+        companyId: storeObj.user_company_id
       })
     );
 

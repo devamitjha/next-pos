@@ -24,7 +24,7 @@ export function useProducts(limit = 16) {
         return `/api/products?page=${pageIndex}&limit=${limit}`;
       }
 
-      return `/api/products/by-type?page=${pageIndex}&limit=${limit}&t=${typeId}`;
+      return `/api/products?page=${pageIndex}&limit=${limit}&t=${typeId}`;
     },
     fetcher,
     { revalidateOnFocus: false }
